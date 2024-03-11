@@ -1,4 +1,4 @@
-## v0.1.0
+## v0.1.1
 ### 😁 Features
 - Print the version of synmake with `synmake version`
 - Generate example config with `synmake generate config`
