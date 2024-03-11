@@ -1,22 +1,26 @@
 package config
 
 import (
-	"fmt"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 )
 
-func TestGenerateConfigCmd(t *testing.T) {
-	logger := zap.NewExample()
+func TestIfGenerateConfigCmdIsRunning(t *testing.T) {
+	logger, err := zap.NewDevelopment()
+	assert.NoError(t, err)
 
 	cmd := GetGenerateConfigCmd(logger)
-	args := []string{}
 
-	fmt.Println(cmd.Runnable())
-	if cmd.Runnable() {
-		err := cmd.RunE(cmd, args)
-		assert.NoError(t, err)
-	}
+	err = cmd.Execute()
+	assert.NoError(t, err, "Expected no error")
+	assert.FileExists(t, "config.yaml", "Expected file to be created")
+
+	shortDescription := cmd.Short
+	longDescription := cmd.Long
+	assert.Greater(t, longDescription, shortDescription)
+
+	os.Remove("config.yaml")
 }

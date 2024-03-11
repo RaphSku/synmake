@@ -9,5 +9,6 @@ func main() {
 	logger := logging.SetupZapLogger()
 
 	cli := cmd.NewCLI(logger)
+	cli.AddSubCommands()
 	cli.Execute()
 }

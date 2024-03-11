@@ -11,11 +11,6 @@ import (
 	"go.uber.org/zap"
 )
 
-var (
-	scopedLogger   *zap.Logger
-	configFilePath string
-)
-
 type CLI struct {
 	logger *zap.Logger
 
@@ -23,12 +18,27 @@ type CLI struct {
 }
 
 func NewCLI(logger *zap.Logger) *CLI {
+	var configFilePath string
+
 	rootCmd := &cobra.Command{
 		Use:   "synmake",
 		Short: "synmake helps you with the setup of Makefiles!",
 		Long:  `Based on a yaml config, synmake will generate a Makefile template for you!`,
-		Run:   rootResolver,
+		Run: func(cmd *cobra.Command, args []string) {
+			if configFilePath != "" {
+				configManager := c2.NewConfigManager(logger, configFilePath)
+				err := configManager.Parse().Apply()
+				if err != nil {
+					logger.Error("The config file could not be parsed and applied", zap.Error(err))
+					os.Exit(1)
+				}
+			}
+		},
 	}
+
+	rootCmd.CompletionOptions.DisableDefaultCmd = true
+	rootCmd.Flags().StringVarP(&configFilePath, "config", "", "", "Specify the filepath to your config yaml.")
+	rootCmd.MarkFlagRequired("config")
 
 	return &CLI{
 		logger:  logger,
@@ -36,34 +46,19 @@ func NewCLI(logger *zap.Logger) *CLI {
 	}
 }
 
-func (cli *CLI) Execute() {
-	scopedLogger = cli.logger
-
-	cli.rootCmd.CompletionOptions.DisableDefaultCmd = true
-	cli.rootCmd.Flags().StringVarP(&configFilePath, "config", "", "", "Specify the filepath to your config yaml.")
-	cli.rootCmd.MarkFlagRequired("config")
-
+func (cli *CLI) AddSubCommands() {
 	versionCmd := version.GetVersionCmd(cli.logger)
 	cli.rootCmd.AddCommand(versionCmd)
 
 	generateCmd := generate.GetGenerateCmd()
-	cli.rootCmd.AddCommand(generateCmd)
+	cli.rootCmd.AddCommand(&generateCmd)
 	configCmd := config.GetGenerateConfigCmd(cli.logger)
-	generateCmd.AddCommand(configCmd)
+	generateCmd.AddCommand(&configCmd)
+}
 
+func (cli *CLI) Execute() {
 	if err := cli.rootCmd.Execute(); err != nil {
 		cli.logger.Info("CLI failed to run", zap.Error(err))
 		os.Exit(1)
-	}
-}
-
-func rootResolver(cmd *cobra.Command, args []string) {
-	if configFilePath != "" {
-		configManager := c2.NewConfigManager(scopedLogger, configFilePath)
-		err := configManager.Parse().Apply()
-		if err != nil {
-			scopedLogger.Error("The config file could not be parsed and applied", zap.Error(err))
-			os.Exit(1)
-		}
 	}
 }
