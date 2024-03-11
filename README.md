@@ -9,7 +9,7 @@ Nowadays, the majority of people are used to writing YAML. synmake allows you to
 ## How to install synmake
 You can either install synmake via Go1.21+ with the following command:
 ```bash
-go install github.com/RaphSku/synmake
+go install github.com/RaphSku/synmake@latest
 ```
 
 Alternatively, check the release page and install the binary. There are binaries provided for Windows, MacOS and Linux.
