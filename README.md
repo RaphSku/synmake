@@ -1,5 +1,5 @@
 # synmake
-![Version](https://img.shields.io/badge/version-v0.1.0-orange)
+![Version](https://img.shields.io/badge/version-v0.1.1-orange)
 ![CI](https://github.com/RaphSku/synmake/workflows/Go%20CI/badge.svg)
 ## What is synmake?
 You will not need synmake, when you have to write a simple Makefiles but synmake should rather help you in times where you cannot remember, e.g. how to setup a preflight check for checking the minimum required version of a tool or how to print a help window that describes the available targets. 
