@@ -13,7 +13,7 @@ func GetVersionCmd(logger *zap.Logger) *cobra.Command {
 		Short: "Print the version number of synmake.",
 		Long:  `This will show you the version of synmake in the format: {MAJOR}-{MINOR}-{PATCH}.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("v0.1.0")
+			fmt.Println("v0.1.1")
 		},
 	}
 
