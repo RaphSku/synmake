@@ -1,29 +1,38 @@
-package config
+package config_test
 
 import (
-	"os"
+	"bytes"
 	"testing"
 
+	"github.com/RaphSku/synmake/internal/config"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 )
 
 func TestApply(t *testing.T) {
+	t.Parallel()
+
+	// --- Setup Logger
 	logger, err := zap.NewDevelopment()
 	assert.NoError(t, err)
 
-	configString := GetConfigAsYamlString(logger)
+	// --- Generate example configuration for testing
+	configBuffer := &bytes.Buffer{}
+	config.GenerateExampleYamlConfig(logger, configBuffer)
 
-	file, err := os.Create("config.yaml")
+	// --- Initialise new config manager
+	configFileBuffer := NewFileBuffer("config.yaml")
+	configFileBuffer.Write(configBuffer.Bytes())
+	cm, err := config.NewConfigManager(logger, configFileBuffer)
 	assert.NoError(t, err)
-	defer file.Close()
-	_, err = file.WriteString(configString)
+	err = cm.Parse()
 	assert.NoError(t, err)
 
-	cm := NewConfigManager(logger, "config.yaml")
-	cm.Apply()
-	assert.FileExists(t, "Makefile")
+	// --- Test generation of Makefile
+	actualMakefile := NewFileBuffer("Makefile")
+	err = cm.Apply(actualMakefile)
+	assert.NoError(t, err)
 
-	os.Remove("Makefile")
-	os.Remove("config.yaml")
+	expectedMakefileByteLength := 1646
+	assert.Equal(t, expectedMakefileByteLength, len(actualMakefile.buffer.Bytes()))
 }

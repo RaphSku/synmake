@@ -8,6 +8,7 @@ import (
 
 func TestSuggarInit(t *testing.T) {
 	t.Parallel()
+
 	var ss SuggarString
 	assert.Equal(t, ss.value, "")
 
@@ -18,6 +19,7 @@ func TestSuggarInit(t *testing.T) {
 
 func TestLineBreakAndTabs(t *testing.T) {
 	t.Parallel()
+
 	var ss SuggarString
 	ss.lineBreak().tab()
 
@@ -26,6 +28,7 @@ func TestLineBreakAndTabs(t *testing.T) {
 
 func TestAppendString(t *testing.T) {
 	t.Parallel()
+
 	exp_value := "Testing This"
 	var ss SuggarString
 	ss.appendString(exp_value)
@@ -35,6 +38,7 @@ func TestAppendString(t *testing.T) {
 
 func TestChaining(t *testing.T) {
 	t.Parallel()
+
 	value := "Test this"
 	var ss SuggarString
 	ss.lineBreak().appendString(value).tab()

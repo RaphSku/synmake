@@ -1,13 +1,17 @@
-package generate
+package generate_test
 
 import (
 	"testing"
 
+	"github.com/RaphSku/synmake/cmd/generate"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestIfGenerateCmdIsRunning(t *testing.T) {
-	cmd := GetGenerateCmd()
+	t.Parallel()
+
+	generateCommand := generate.NewGenerateConfigCmd()
+	cmd := generateCommand.GetGenerateConfigCmd()
 
 	err := cmd.Execute()
 	assert.NoError(t, err)

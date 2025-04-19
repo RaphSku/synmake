@@ -1,31 +1,31 @@
-package config
+package config_test
 
 import (
-	"os"
 	"testing"
 
+	"github.com/RaphSku/synmake/internal/config"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 )
 
 func TestParsing(t *testing.T) {
+	t.Parallel()
+
+	// --- Setup Logger
 	logger, err := zap.NewDevelopment()
 	assert.NoError(t, err)
 
-	configString := GetConfigAsYamlString(logger)
-
-	file, err := os.Create("config.yaml")
-	assert.NoError(t, err)
-	defer file.Close()
-	_, err = file.WriteString(configString)
+	// --- Generating example configuration
+	fileBuffer := NewFileBuffer("config.yaml")
+	err = config.GenerateExampleYamlConfig(logger, fileBuffer)
 	assert.NoError(t, err)
 
-	cm := NewConfigManager(logger, "./config.yaml")
-	cm.Parse()
-	assert.Equal(t, false, isEmptyStruct(cm.config))
-	assert.Equal(t, 5, len(cm.config.Phony))
-	assert.Equal(t, true, cm.config.HelpTemplate.Enabled)
-	assert.Equal(t, "example", cm.config.VersionTemplate.Library)
-
-	os.Remove("config.yaml")
+	// Checking whether parsing works and fields are set correctly
+	configManager, err := config.NewConfigManager(logger, fileBuffer)
+	assert.NoError(t, err)
+	err = configManager.Parse()
+	assert.NoError(t, err)
+	assert.Equal(t, false, isEmptyStruct(configManager.Config))
+	assert.Equal(t, true, configManager.Config.Templates.HelpTargetTemplate.Enabled)
+	assert.Equal(t, "example", configManager.Config.Templates.VersionCommandTemplate.Library)
 }

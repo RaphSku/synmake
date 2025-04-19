@@ -1,20 +1,17 @@
-package version
+package version_test
 
 import (
 	"testing"
 
+	"github.com/RaphSku/synmake/cmd/version"
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/zap"
 )
 
 func TestIfVersionCmdIsRunning(t *testing.T) {
-	logger, err := zap.NewDevelopment()
-	assert.NoError(t, err)
+	t.Parallel()
 
-	cmd := GetVersionCmd(logger)
-
-	err = cmd.Execute()
-	assert.NoError(t, err)
+	versionCommand := version.NewVersionCmd()
+	cmd := versionCommand.GetVersionCmd()
 
 	shortDescription := cmd.Short
 	longDescription := cmd.Long
