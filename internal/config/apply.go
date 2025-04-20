@@ -61,7 +61,11 @@ func (cm *ConfigManager) applyConfig(w io.StringWriter) error {
 
 	// --- TARGETS ADDED
 	cm.logger.Info("Targets will be added", zap.String("func", "applyConfig"))
-	content = content.addSuggar(assembleTargets(cm.Config.Targets, cm.Config.Templates.HelpTargetTemplate.Delimiter))
+	delimiter := "#"
+	if cm.Config.Templates.HelpTargetTemplate.Enabled {
+		delimiter = cm.Config.Templates.HelpTargetTemplate.Delimiter
+	}
+	content = content.addSuggar(assembleTargets(cm.Config.Targets, delimiter))
 	cm.logger.Info("Targets added", zap.String("func", "applyConfig"))
 
 	// --- HELP TARGET ADDED

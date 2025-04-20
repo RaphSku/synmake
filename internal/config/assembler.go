@@ -45,15 +45,10 @@ func assemblePreflightTarget(commands []string) SuggarString {
 }
 
 func assembleTargets(targetMap map[string]Target, delimiter string) SuggarString {
-	helpDelimiter := ""
-	if delimiter != "" {
-		helpDelimiter = delimiter
-	}
-
 	var content SuggarString
 	for targetName, targetConfig := range targetMap {
 		content.appendString(".PHONY:").appendString(" ").appendString(targetName).lineBreak()
-		content.appendString(helpDelimiter).appendString(" ").appendString(targetConfig.HelpDescription).lineBreak()
+		content.appendString(delimiter).appendString(" ").appendString(targetConfig.HelpDescription).lineBreak()
 		content.appendString(targetName + ":").appendString(" ")
 		preTargets := concatStringsWithWhiteSpaces(targetConfig.PreTargets...)
 		content.appendString(preTargets).lineBreak().tab()
