@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func SetupZapLogger() *zap.Logger {
+func SetupZapLogger(debugMode bool) *zap.Logger {
 	logLevel := zapcore.InfoLevel
 
 	encoderConfig := zap.NewProductionEncoderConfig()
@@ -24,7 +24,11 @@ func SetupZapLogger() *zap.Logger {
 		zap.Fields(zap.String("service", "synmake")),
 	}
 
-	logger := zap.New(core, loggerOptions...)
+	if debugMode {
+		logger := zap.New(core, loggerOptions...)
+		logger = logger.Named("synmake")
+		return logger
+	}
 
-	return logger
+	return zap.NewNop()
 }

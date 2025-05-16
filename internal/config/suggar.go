@@ -22,3 +22,8 @@ func (ss *SuggarString) appendString(str string) *SuggarString {
 	ss.value += str
 	return ss
 }
+
+func (ss *SuggarString) addSuggar(suggar SuggarString) *SuggarString {
+	ss.value += suggar.value
+	return ss
+}

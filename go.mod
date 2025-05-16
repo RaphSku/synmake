@@ -1,10 +1,8 @@
 module github.com/RaphSku/synmake
 
-go 1.21.0
+go 1.24.2
 
-retract (
-    v0.1.0
-)
+retract v0.1.0
 
 require (
 	github.com/spf13/cobra v1.8.0

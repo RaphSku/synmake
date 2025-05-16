@@ -1,54 +1,88 @@
 package config
 
 import (
-	"os"
+	"io"
 
 	"github.com/RaphSku/synmake/internal/templates"
 	"go.uber.org/zap"
 )
 
-func (c *ConfigManager) Apply() error {
-	err := c.applyConfig()
+func (cm *ConfigManager) Apply(file FileInterface) error {
+	err := cm.applyConfig(file)
 	if err != nil {
-		c.logger.Error("config could not be applied", zap.Error(err))
-		os.Exit(1)
+		cm.logger.Error("Config could not be applied", zap.String("func", "Apply"), zap.Error(err))
+		return err
 	}
 
 	return nil
 }
 
-func (c *ConfigManager) applyConfig() error {
-	file, err := os.Create("Makefile")
+func (cm *ConfigManager) applyConfig(w io.StringWriter) error {
+	content := &SuggarString{}
+
+	var versionContent string
+	versionConstants := []string{}
+	if cm.Config.Templates.VersionCommandTemplate.Enabled {
+		versionContent, versionConstants = templates.GetVersionTemplate(
+			cm.Config.Templates.VersionCommandTemplate.Library,
+			cm.Config.Templates.VersionCommandTemplate.MinVersion,
+		)
+	}
+
+	// --- VARIABLES
+	cm.logger.Info("Variables will be added", zap.String("func", "applyConfig"))
+	variables := []string{}
+	if cm.Config.Templates.VersionCommandTemplate.Enabled {
+		for _, constant := range versionConstants {
+			variables = append(variables, constant)
+		}
+	}
+	content = content.addSuggar(assembleVariables(variables)).lineBreak()
+	cm.logger.Info("Variables added", zap.String("func", "applyConfig"))
+
+	// --- HELP TEMPLATE DEFAULT TARGET
+	if cm.Config.Templates.HelpTargetTemplate.Enabled {
+		cm.logger.Info("Help template default target will be added", zap.String("func", "applyConfig"))
+		content = content.addSuggar(assembleDefaultTarget()).lineBreak().lineBreak()
+		cm.logger.Info("Help template default target added", zap.String("func", "applyConfig"))
+	}
+
+	// --- PREFLIGHT
+	cm.logger.Info("Preflight target will be added", zap.String("func", "applyConfig"))
+	commands := []string{}
+	if cm.Config.Templates.VersionCommandTemplate.Enabled {
+		commands = append(
+			commands,
+			versionContent,
+		)
+	}
+	content = content.addSuggar(assemblePreflightTarget(commands))
+	cm.logger.Info("Preflight target added", zap.String("func", "applyConfig"))
+
+	// --- TARGETS ADDED
+	cm.logger.Info("Targets will be added", zap.String("func", "applyConfig"))
+	delimiter := "#"
+	if cm.Config.Templates.HelpTargetTemplate.Enabled {
+		delimiter = cm.Config.Templates.HelpTargetTemplate.Delimiter
+	}
+	content = content.addSuggar(assembleTargets(cm.Config.Targets, delimiter))
+	cm.logger.Info("Targets added", zap.String("func", "applyConfig"))
+
+	// --- HELP TARGET ADDED
+	if cm.Config.Templates.HelpTargetTemplate.Enabled {
+		cm.logger.Info("Help target will be added", zap.String("func", "applyConfig"))
+		content = content.appendString(templates.GetHelpTemplate())
+		cm.logger.Info("Help target added", zap.String("func", "applyConfig"))
+	}
+
+	// --- WRITE MAKEFILE
+	cm.logger.Info("Writing to Makefile", zap.String("func", "applyConfig"))
+	_, err := w.WriteString(content.getString())
 	if err != nil {
-		c.logger.Error("error creating file", zap.Error(err))
+		cm.logger.Error("Failed to write to Makefile", zap.String("func", "applyConfig"), zap.Error(err))
 		return err
 	}
-	defer file.Close()
-
-	cnt := newContent(c.logger, c.config)
-	if c.config.HelpTemplate.Enabled {
-		cnt.assembleDefaultToContent()
-	}
-	cnt.assembleTargetsToContent()
-	if c.config.HelpTemplate.Enabled {
-		helpTemplate := templates.GetHelpTemplate()
-		cnt.Help = helpTemplate
-	}
-	if c.config.VersionTemplate.Enabled {
-		versionTemplate, versionConstants := templates.GetVersionTemplate(c.config.VersionTemplate.Library, c.config.VersionTemplate.MinVersion)
-		cnt.Constants = append(cnt.Constants, versionConstants...)
-		cnt.Preflight = append(cnt.Preflight, versionTemplate)
-	}
-	cnt.assemblePhonyToContent()
-
-	content := cnt.assembleAll()
-	_, err = file.WriteString(content)
-	if err != nil {
-		c.logger.Error("error writing to file", zap.Error(err))
-		return err
-	}
-
-	c.logger.Info("file has been created successfully")
+	cm.logger.Info("Makefile has been created successfully!", zap.String("func", "applyConfig"))
 
 	return nil
 }

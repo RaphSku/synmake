@@ -1,7 +1,8 @@
 package templates
 
 func GetHelpTemplate() string {
-	content := `help:
+	content := `.PHONY: help
+help:
 	@echo "----------------------------------"
 	@echo "Welcome to make! Enjoy the flight."
 	@echo "Makefile - make [\033[38;5;154mtarget\033[0m]"

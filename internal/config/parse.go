@@ -1,32 +1,32 @@
 package config
 
 import (
-	"os"
+	"io"
 
 	"go.uber.org/zap"
 	yaml "gopkg.in/yaml.v3"
 )
 
-func (c *ConfigManager) Parse() *ConfigManager {
-	err := c.parseConfig()
+func (cm *ConfigManager) Parse() error {
+	err := cm.parseConfig(cm.File)
 	if err != nil {
-		c.logger.Error("config file could not be parsed successfully", zap.Error(err))
-		os.Exit(1)
-	}
-
-	return c
-}
-
-func (c *ConfigManager) parseConfig() error {
-	data, err := os.ReadFile(c.filePath)
-	if err != nil {
-		c.logger.Error("data could not be read", zap.Error(err))
+		cm.logger.Error("config file could not be parsed successfully", zap.String("func", "Parse"), zap.Error(err))
 		return err
 	}
 
-	err = yaml.Unmarshal(data, &c.config)
+	return nil
+}
+
+func (cm *ConfigManager) parseConfig(r io.Reader) error {
+	data, err := io.ReadAll(r)
 	if err != nil {
-		c.logger.Error("data could not be parsed into a valid Config", zap.Error(err))
+		cm.logger.Error("data could not be read", zap.String("func", "parseConfig"), zap.Error(err))
+		return err
+	}
+
+	err = yaml.Unmarshal(data, &cm.Config)
+	if err != nil {
+		cm.logger.Error("data could not be parsed into a valid Config", zap.String("func", "parseConfig"), zap.Error(err))
 		return err
 	}
 

@@ -9,18 +9,21 @@ import (
 )
 
 func TestIfGenerateConfigCmdIsRunning(t *testing.T) {
+	defer os.Remove("config.yaml")
+
+	// --- Setup Logger
 	logger, err := zap.NewDevelopment()
 	assert.NoError(t, err)
 
-	cmd := GetGenerateConfigCmd(logger)
+	// --- Checking whether the config.yaml is being created
+	generateConfigCommand := NewGenerateConfigSubCmd(logger)
+	cmd := generateConfigCommand.GetGenerateConfigSubCmd()
 
 	err = cmd.Execute()
-	assert.NoError(t, err, "Expected no error")
-	assert.FileExists(t, "config.yaml", "Expected file to be created")
+	assert.NoError(t, err)
+	assert.FileExists(t, "config.yaml")
 
 	shortDescription := cmd.Short
 	longDescription := cmd.Long
 	assert.Greater(t, longDescription, shortDescription)
-
-	os.Remove("config.yaml")
 }
