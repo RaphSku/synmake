@@ -35,6 +35,9 @@ synmake --config=<path/to/your/config.yaml> --debug
 An example configuration file might look like this:
 ```yaml
 ---
+env:
+  - .env
+  - .env.local
 targets:
   targetA:
     helpDescription: targetA just prints an output
@@ -59,6 +62,9 @@ templates:
     library: example
     minVersion: 0.1.0
 ```
+
+### Env files
+List all env files that should be used inside the Makefile
 
 ### Targets
 Each key under targets specifies a new target where you can specify 3 attributes:

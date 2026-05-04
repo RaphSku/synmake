@@ -29,6 +29,11 @@ func (cm *ConfigManager) applyConfig(w io.StringWriter) error {
 		)
 	}
 
+	// -- Env files
+	cm.logger.Info("Inserting env file includes", zap.Strings("func", cm.Config.EnvFiles))
+	content = content.addSuggar(assembleEnvFiles(cm.Config.EnvFiles))
+	cm.logger.Info("Env files included")
+
 	// --- VARIABLES
 	cm.logger.Info("Variables will be added", zap.String("func", "applyConfig"))
 	variables := []string{}

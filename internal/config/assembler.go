@@ -44,6 +44,16 @@ func assemblePreflightTarget(commands []string) SuggarString {
 	return content
 }
 
+func assembleEnvFiles(envFiles []string) SuggarString {
+	var content SuggarString
+
+	for _, envFile := range envFiles {
+		content.appendString("-include").appendString(" ").appendString(envFile).lineBreak()
+	}
+
+	return content
+}
+
 func assembleTargets(targetMap map[string]Target, delimiter string) SuggarString {
 	var content SuggarString
 	for targetName, targetConfig := range targetMap {

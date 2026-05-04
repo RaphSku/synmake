@@ -28,6 +28,7 @@ type OptionalTemplates struct {
 }
 
 type Config struct {
+	EnvFiles  []string          `yaml:"env"`
 	Targets   map[string]Target `yaml:"targets"`
 	Templates OptionalTemplates `yaml:"templates"`
 }

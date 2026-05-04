@@ -2,8 +2,9 @@ package config
 
 import (
 	"bytes"
-	"gopkg.in/yaml.v3"
 	"io"
+
+	"gopkg.in/yaml.v3"
 
 	"go.uber.org/zap"
 )
@@ -23,6 +24,7 @@ func GenerateExampleYamlConfig(logger *zap.Logger, w io.StringWriter) error {
 	}
 
 	config := Config{
+		EnvFiles: []string{},
 		Targets: map[string]Target{
 			"targetA": tA,
 			"targetB": tB,
