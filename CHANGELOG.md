@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.3.0
+### Features
+- New `variables` config field allowing the user to specify variables with different assignment operators.
+- Introducing the following `functions`: require environment variable function, require
+file function, require directory function, require confirmation function, require tool version function.
+
+### Changed
+- `targets` is an array now and not a map and therefore the `name` is part of the target configuration.
+- There is no `versionTemplate` anymore, instead there is a better `require_tool` function that can be used in targets.
+
 ## v0.2.0
 ### Changed
 - Restructured/Refactored code base and removed unnecessary intermediary components

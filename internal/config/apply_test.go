@@ -33,6 +33,6 @@ func TestApply(t *testing.T) {
 	err = cm.Apply(actualMakefile)
 	assert.NoError(t, err)
 
-	expectedMakefileByteLength := 1646
+	expectedMakefileByteLength := 2455
 	assert.Equal(t, expectedMakefileByteLength, len(actualMakefile.buffer.Bytes()))
 }

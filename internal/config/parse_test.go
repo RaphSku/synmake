@@ -27,5 +27,4 @@ func TestParsing(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, false, isEmptyStruct(configManager.Config))
 	assert.Equal(t, true, configManager.Config.Templates.HelpTargetTemplate.Enabled)
-	assert.Equal(t, "example", configManager.Config.Templates.VersionCommandTemplate.Library)
 }

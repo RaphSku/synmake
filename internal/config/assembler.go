@@ -16,13 +16,20 @@ func concatStringsWithWhiteSpaces(strs ...string) string {
 	return result
 }
 
-func assembleVariables(variables []string) SuggarString {
+func assembleVariables(variables []Variable) (SuggarString, error) {
 	var content SuggarString
-	for i := range variables {
-		content.appendString(variables[i]).lineBreak()
+	for _, variable := range variables {
+		if variable.Export {
+			content.appendString(fmt.Sprintf("%s ", "export"))
+		}
+		operator := variable.Operator.Symbol()
+		if operator == "" {
+			return content, fmt.Errorf("The specified operator '%s' does not exist, list of available operators: %s", variable.Operator, JoinAssignmentOperators())
+		}
+		content.appendString(fmt.Sprintf("%s %s %s", variable.Key, operator, variable.Value)).lineBreak()
 	}
 
-	return content
+	return content, nil
 }
 
 func assembleDefaultTarget() SuggarString {
@@ -33,8 +40,47 @@ func assembleDefaultTarget() SuggarString {
 	return content
 }
 
+func assembleRequireToolFunction(functionContent string) SuggarString {
+	var content SuggarString
+	content.appendString(functionContent)
+
+	return content
+}
+
+func assembleRequireEnvFunction(functionContent string) SuggarString {
+	var content SuggarString
+	content.appendString(functionContent)
+
+	return content
+}
+
+func assembleRequireFileFunction(functionContent string) SuggarString {
+	var content SuggarString
+	content.appendString(functionContent)
+
+	return content
+}
+
+func assembleRequireDirFunction(functionContent string) SuggarString {
+	var content SuggarString
+	content.appendString(functionContent)
+
+	return content
+}
+
+func assembleRequireConfirmationFunction(functionContent string) SuggarString {
+	var content SuggarString
+	content.appendString(functionContent)
+
+	return content
+}
+
 func assemblePreflightTarget(commands []string) SuggarString {
 	var content SuggarString
+	if len(commands) == 0 {
+		return content
+	}
+
 	content.appendString(".PHONY: preflight").lineBreak()
 	content.appendString("preflight:").lineBreak().tab()
 	for _, command := range commands {
@@ -44,9 +90,10 @@ func assemblePreflightTarget(commands []string) SuggarString {
 	return content
 }
 
-func assembleTargets(targetMap map[string]Target, delimiter string) SuggarString {
+func assembleTargets(targets []Target, delimiter string) SuggarString {
 	var content SuggarString
-	for targetName, targetConfig := range targetMap {
+	for _, targetConfig := range targets {
+		targetName := targetConfig.Name
 		content.appendString(".PHONY:").appendString(" ").appendString(targetName).lineBreak()
 		content.appendString(delimiter).appendString(" ").appendString(targetConfig.HelpDescription).lineBreak()
 		content.appendString(targetName + ":").appendString(" ")
