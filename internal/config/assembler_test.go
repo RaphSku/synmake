@@ -14,13 +14,14 @@ func TestAssembleTargetsToContent(t *testing.T) {
 
 	var config Config
 	targetA := Target{
+		Name:            "targetA",
 		HelpDescription: "help test",
 		PreTargets:      []string{"default", "preflight"},
 		Commands:        []string{"echo \"Test this\""},
 		Display:         false,
 	}
 
-	config.Targets = map[string]Target{"targetA": targetA}
+	config.Targets = []Target{targetA}
 	ss := assembleTargets(config.Targets, "")
 
 	assert.Equal(t, exp_target, ss.getString())

@@ -24,5 +24,5 @@ func (vc *VersionCmd) GetVersionCmd() *cobra.Command {
 }
 
 func (vc *VersionCmd) runVersionCmd(cmd *cobra.Command, args []string) {
-	fmt.Println("v0.2.0")
+	fmt.Println("v0.3.0")
 }

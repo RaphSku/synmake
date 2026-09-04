@@ -8,6 +8,10 @@ func (ss *SuggarString) getString() string {
 	return ss.value
 }
 
+func (ss *SuggarString) isEmpty() bool {
+	return len(ss.value) == 0
+}
+
 func (ss *SuggarString) lineBreak() *SuggarString {
 	ss.value += "\n"
 	return ss

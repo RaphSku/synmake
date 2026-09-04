@@ -62,11 +62,13 @@ func (cli *CLI) runSynmakeCommand(cmd *cobra.Command, args []string) {
 	file, err := os.OpenFile(configFilePath, os.O_RDONLY, 0644)
 	if err != nil {
 		cli.logger.Error("Could not create config file", zap.String("func", "runSynmakeCommand"), zap.Error(err))
+		fmt.Printf("could not create config file: %v\n", err)
 		os.Exit(1)
 	}
 	configManager, err := c2.NewConfigManager(cli.logger, file)
 	if err != nil {
 		cli.logger.Error("Failed to initialize a new config manager", zap.String("func", "runSynmakeCommand"), zap.Error(err))
+		fmt.Printf("failed to initialize a new config manager: %v\n", err)
 		os.Exit(1)
 	}
 	defer configManager.Close()
@@ -74,18 +76,21 @@ func (cli *CLI) runSynmakeCommand(cmd *cobra.Command, args []string) {
 	err = configManager.Parse()
 	if err != nil {
 		cli.logger.Error("Parsing of the config file failed", zap.String("func", "runSynmakeCommand"), zap.Error(err))
+		fmt.Printf("could not parse the config fail: %v\n", err)
 		os.Exit(1)
 	}
 
 	file, err = os.OpenFile("Makefile", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		cli.logger.Error("Could not create Makefile", zap.String("func", "runSynmakeCommand"), zap.Error(err))
+		fmt.Printf("could not create Makefile: %v\n", err)
 		os.Exit(1)
 	}
 	defer file.Close()
 	err = configManager.Apply(file)
 	if err != nil {
 		cli.logger.Error("The config file could not be applied", zap.String("func", "runSynmakeCommand"), zap.Error(err))
+		fmt.Printf("config file could not be applied: %v\n", err)
 		os.Exit(1)
 	}
 	return
